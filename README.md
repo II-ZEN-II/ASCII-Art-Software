@@ -6,6 +6,8 @@ LMB -> Paint
 RMB -> Erase  
 SCROLL -> Zoom  
 MMB or LMB + SPACE -> Move  
+UP and DOWN -> Change character  
+ANY KEY -> Set character to key  
 TAB -> Toggle grid  
 CTRL + R -> Clear canvas  
 CTRL + S -> Save art  
