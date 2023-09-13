@@ -7,7 +7,9 @@ import pygame
 
 
 WINDOW_CAPTION = "ASCII Art Software"
-FPS = 0  # If zero then FPS is uncapped
+FPS = 100  # If zero then FPS is uncapped
+FLAGS = 0  # If zero then no flags
+VSYNC = True
 
 EMPTY = ' '
 ASCII_CHARS = '''!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'''
@@ -17,17 +19,16 @@ GRID_COLOUR = (150, 150, 150)
 TEXT_COLOUR = (255, 0, 255)
 GHOST_TEXT_COLOUR = (65, 55, 65)
 
-SAVE_PATH = "saved/"  # Will be changed in future version when saving UI implemented
+SAVE_PATH = ""  # Will be changed in future version when saving UI implemented
 
 
 def main():
-
     # Initialise pygame
     pygame.init()
     monitor = pygame.display.Info()
     smallest = min(monitor.current_w, monitor.current_h)
     WINDOW_RESOLUTION = (smallest//2, smallest//2)
-    window = pygame.display.set_mode(WINDOW_RESOLUTION)
+    window = pygame.display.set_mode(WINDOW_RESOLUTION, FLAGS, vsync=VSYNC)
     clock = pygame.time.Clock()
 
     pygame.mouse.set_visible(False)
@@ -52,7 +53,7 @@ def main():
     key_repeat_timer = 0
     current_char_index = 2
     current_char = ASCII_CHARS[current_char_index]
-    last_mouse_pos = (0,0)
+    last_mouse_pos = (0, 0)
 
     save = False
     reset = False
@@ -61,7 +62,7 @@ def main():
 
     while True:
         dt = clock.tick(FPS)/1000
-        pygame.display.set_caption(f"{WINDOW_CAPTION} | FPS {int(clock.get_fps())}")
+        # pygame.display.set_caption(f"{int(clock.get_fps())}")
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_pressed = pygame.mouse.get_pressed()
@@ -147,7 +148,7 @@ def main():
             save = False
 
         # Dragging
-        if mouse_pressed[1] or mouse_pressed[0] and keys[pygame.K_SPACE]:  # Middle mouse button
+        if mouse_pressed[1] or mouse_pressed[0] and keys[pygame.K_SPACE]:
             drag_vector = ((last_mouse_pos[0] - mouse_pos[0])/camera_zoom,
                            (last_mouse_pos[1] - mouse_pos[1])/camera_zoom)
             camera_pos = (camera_pos[0] + drag_vector[0], camera_pos[1] + drag_vector[1])
@@ -155,21 +156,21 @@ def main():
                           clamp(camera_pos[1], camera_bounds_y[0], camera_bounds_y[1]))
 
         # Erasing
-        elif mouse_pressed[2]:  # Right mouse button
-            # inside of grid panel
-            if mouse_pos[0] > 0 and mouse_pos[0] < WINDOW_RESOLUTION[0] and mouse_pos[1] > 0 and mouse_pos[1] < WINDOW_RESOLUTION[1]:
-                grid_pos =  (int(((mouse_pos[0]-camera_offset[0])/camera_zoom + camera_pos[0])/square_size[0]),
-                             int(((mouse_pos[1]-camera_offset[1])/camera_zoom + camera_pos[1])/square_size[1]))
-                if grid_pos[0] >= 0 and grid_pos[0] < width and grid_pos[1] >= 0 and grid_pos[1] < height:
-                    # inside of grid and can paint
-                    canvas[grid_pos[1]][grid_pos[0]] = EMPTY
-
-        # Painting
-        elif mouse_pressed[0]:  # Left mouse button
+        elif mouse_pressed[2]:
             world_pos = ((mouse_pos[0]-camera_offset[0])/camera_zoom + camera_pos[0],
                             (mouse_pos[1]-camera_offset[1])/camera_zoom + camera_pos[1])
             grid_pos =  (int(world_pos[0]/square_size[0]),
                             int(world_pos[1]/square_size[1]))
+            if inside_bounds(grid_pos[0], 0, width-1) and inside_bounds(grid_pos[1], 0, height-1):
+                # inside of grid and can erase
+                canvas[grid_pos[1]][grid_pos[0]] = EMPTY
+
+        # Painting
+        elif mouse_pressed[0]:
+            world_pos = ((mouse_pos[0]-camera_offset[0])/camera_zoom + camera_pos[0],
+                         (mouse_pos[1]-camera_offset[1])/camera_zoom + camera_pos[1])
+            grid_pos = (int(world_pos[0]/square_size[0]),
+                        int(world_pos[1]/square_size[1]))
             if inside_bounds(grid_pos[0], 0, width-1) and inside_bounds(grid_pos[1], 0, height-1):
                 # inside of grid and can paint
                 canvas[grid_pos[1]][grid_pos[0]] = current_char
