@@ -29,6 +29,7 @@ def main():
     smallest = min(monitor.current_w, monitor.current_h)
     WINDOW_RESOLUTION = (smallest//2, smallest//2)
     window = pygame.display.set_mode(WINDOW_RESOLUTION, FLAGS, vsync=VSYNC)
+    pygame.display.set_caption(WINDOW_CAPTION)
     clock = pygame.time.Clock()
 
     pygame.mouse.set_visible(False)
