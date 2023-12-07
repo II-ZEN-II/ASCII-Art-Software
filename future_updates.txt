@@ -1,0 +1,6 @@
+PLANNED FOR FUTURE RELEASES  
+- Implement Undo/Redo functionality  
+- Implement Canvas scaling UI  
+- Implement Saving UI  
+- Implement Loading UI and functionality  
+- Implement Colour picker UI and functionality?  
